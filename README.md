@@ -1,25 +1,77 @@
-# relicv2
+# ReLICv2
 
-TODO(b/259211637): Add a description for your new project, explain what is
-being released here, etc... Additional, the following sections are normally
-expected for all releases. Feel free to add additional sections if appropriate
-for your project.
+This implementation provides the linear evaluation pipeline for ReLICv2. The
+module `eval_experiment.py` trains a linear classifier on ImageNet and evaluates
+the performance of the frozen encoder/representation learnt by ReLICv2 on the
+ImageNet test set.
 
-## Installation
+The code provided in repository relies heavily on the BYOL code
+(https://github.com/deepmind/deepmind-research/tree/master/byol).
 
-Write instructions for how the user should install your code. The instructions
-should ideally be valid when copy-pasted. You can combine this with the Usage
-section if there's no separate installation step.
+## Setup
 
-## Usage
+To set up a Python virtual environment with the required dependencies, run:
 
-Write example usage of your code. The instructions should ideally be valid when
-copy-pasted, and will be used by your technical reviewer to verify that your
-package functions correctly.
+```shell
+python3 -m venv relicv2_env
+source relicv2_env/bin/activate
+pip install --upgrade pip
+pip install -r relicv2_env/requirements.txt
+```
+
+The code uses `tensorflow_datasets` to load the ImageNet dataset. Manual
+download may be required; see
+https://www.tensorflow.org/datasets/catalog/imagenet2012 for details.
+
+## Full pipeline for linear evaluation on ImageNet
+
+The various parts of the pipeline can be run using:
+
+```shell
+python -m relicv2.main_loop \
+  --worker_mode=<'train' or 'eval'> \
+  --checkpoint_root=</path/to/the/checkpointing/folder> \
+```
+
+Use `--worker_mode=train` for a training job, which will load the encoder
+weights from an existing checkpoint (form a pretrain experiment) located at
+`<checkpoint_root>/pretrain.pkl`, and train a linear classifier on top of this
+encoder. The main loop for linear evaluation runs for 100 epochs.
+
+The training job will regularly save checkpoints under
+`<checkpoint_root>/linear-eval.pkl`. You can run a second worker (using
+`--worker_mode=eval`) with the same `checkpoint_root` setting to regularly load
+the checkpoint and evaluate the performance of the classifier (trained by the
+linear-eval `train` worker) on the test set.
+
+Note that the config/eval.py is set-up for using the ResNet50 1x architecture.
+If you want to run the code for different architectures, please change the
+encoder_class in config/eval.py.
+
+## ReLICv2 Checkpoints
+
+We provide the following ReLICv2 checkpoints for different ResNet architectures.
+
+-   [ResNet-50 1x](https://drive.google.com/file/d/1PqLiSdGA8zCRVxvdb_6yQYBiTrtWqETn/view?usp=share_link)
+-   [ResNet-50 2x](https://drive.google.com/file/d/1R26CfMZHRPeoHqgY7uEGzgze00fkoudx/view?usp=share_link)
+-   [ResNet-50 4x](https://drive.google.com/file/d/1ZE-Q6zuDfXyYqHjoLdGMNa7dk8npdjJa/view?usp=share_link)
+-   [ResNet-101](https://drive.google.com/file/d/1SXX55JsV8F168hkk2pjnsqMkZjq5jO1I/view?usp=share_link)
+-   [ResNet-152](https://drive.google.com/file/d/1haWbrCB7IF7O7yENvgAYnsDI7AsF1wBF/view?usp=share_link)
+-   [ResNet-200](https://drive.google.com/file/d/1DaTyJj_5HDaOBOVH9PVD7U-Eqh_qeruM/view?usp=share_link)
+-   [ResNet-200 2x](https://drive.google.com/file/d/1uPkFECQV-EbCrn22juz6gaqmP87KaLAD/view?usp=share_link)
 
 ## Citing this work
 
-Add citation details here, usually a pastable BibTeX snippet.
+If you use this code please cite:
+
+```
+@article{tomasev2022pushing,
+  title={Pushing the limits of self-supervised ResNets: Can we outperform supervised learning without labels on ImageNet?},
+  author={Tomasev, Nenad and Bica, Ioana and McWilliams, Brian and Buesing, Lars and Pascanu, Razvan and Blundell, Charles and Mitrovic, Jovana},
+  journal={arXiv preprint arXiv:2201.05119},
+  year={2022}
+}
+```
 
 ## License and disclaimer
 
