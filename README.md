@@ -1,7 +1,9 @@
 # ReLICv2
 
-This implementation provides the linear evaluation pipeline for ReLICv2. The
-module `eval_experiment.py` trains a linear classifier on ImageNet and evaluates
+This implementation provides the linear evaluation code and checkpoints for ReLICv2, a self-supervised method introduced in the paper: [
+Pushing the limits of self-supervised ResNets: Can we outperform supervised learning without labels on ImageNet?](https://arxiv.org/abs/2201.05119)
+
+The module `eval_experiment.py` trains a linear classifier on ImageNet and evaluates
 the performance of the frozen encoder/representation learnt by ReLICv2 on the
 ImageNet test set.
 
